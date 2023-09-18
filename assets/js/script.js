@@ -10,22 +10,35 @@ var finalScore = document.createElement("p")
 var initials = document.createElement("p")
 var textArea = document.createElement("textarea")
 var questionsEl = document.createElement("p")
-var answersEl = document.createElement("div")
+var answersEl = document.createElement("ul")
 var checkAnswers = document.createElement("div")
+var saveBtn = document.createElement("button")
 
+currentQuestion = 0
+
+allQuestions = {
+    "Commonly used datatype do not include:" : ["stings" , "booleans" , "alerts" , "numbers" , 2],
+    
+    "Arrays in JavaScript and be used to store:" : ["other arrays" , "booleans" , "numbers and strings" , "all of the above" , 3],
+    
+    "String values must be closed withing ______ when being assigned to variables." : ["commas" , "curly brackets" , "quotes" , "parenthesis" , 2],
+    
+    "A very useful tool during developement debugging for printing content to the debugger is:" : ["JavaScript" , "terminal" , "for loops" , "console.log" , 3]
+}
 
 h1El.textContent = "Timed Quiz"
 infoEl.textContent = "Select start to start the timer, You will have 75 seconds to complete the quiz. Every wrong answer will remove 15 seconds from your timer. Good Luck!"
 startBtn.textContent = "Start"
-finalScore.textContent = "Your final score is " //+ score
 initials.textContent = "Enter your initials: "
 h2El.textContent = "All done"
+saveBtn.textContent = "Save"
+
 
 h1El.setAttribute("style", "margin:auto; padding-top:50px; text-align:center;");
 infoEl.setAttribute("style", "margin:auto; padding:50px; text-align:center;");
 startBtn.setAttribute("style", "position: absolute; left: 50%; background-color: pink; font-size: 20px;");
 timer.setAttribute("style", "text-align: right;")
-divEl.setAttribute("style", "display: flex; align-items: baseline; justify-content:center;")
+divEl.setAttribute("style", "display: flex; flex-direction:column; align-items: center; justify-content:center;")
 textArea.setAttribute("style", "height: 16px; width: 100px;")
 h2El.setAttribute("style", "text-align: center;")
 finalScore.setAttribute("style", "text-align: center;")
@@ -43,8 +56,17 @@ startBtn.addEventListener("click", function(){
     body.removeChild(h1El);
     body.removeChild(infoEl);
     body.removeChild(startBtn);
+    body.appendChild(divEl)
+    divEl.appendChild(questionsEl)
+    divEl.appendChild(answersEl)
 
-    var timeLeft = 1;
+    questionsEl.setAttribute("style","text-align: center; display: flex; justify-content:center; font-weight: bolder; font-size:25px;")
+
+    questionsEl.classList.add("questions")
+    answersEl.classList.add("answers")
+
+
+    var timeLeft = 75;
     var startTime = setInterval(function(){
         if(timeLeft < 0){
         gameOver();
@@ -52,37 +74,121 @@ startBtn.addEventListener("click", function(){
         
         } else {
         timer.innerHTML = "Time remaining: " + timeLeft;
-        quiz()
-    }
-    timeLeft -= 1;
-}, 1000)
 
+        getQuestions(currentQuestion)
+        getAnswers(currentQuestion)
+        
+
+        divEl.appendChild(checkAnswers)
     
 
+
+    function getQuestions(curr){
+        var questions = Object.keys(allQuestions)[curr]
+        questionsEl.innerHTML= "";
+        questionsEl.innerHTML= questions;
+    
+    
+    }
+    
+    function getAnswers(curr){
+    
+        var answers = allQuestions[Object.keys(allQuestions)[curr]];
+    
+        answersEl.innerHTML = "";
+    
+    
+        for(var i = 0; i < answers.length-1; i += 1){
+            text=document.createTextNode(answers[i])
+            divText=document.createElement("li")
+            divText.setAttribute("style", "text-align: center; font-size:25; border:solid; padding-top: 10px;")
+    
+            divText.appendChild(text)
+            divText.addEventListener("click",checkingAnswers(i, answers))
+            answersEl.appendChild(divText);
+    
+    
+        answersEl.appendChild(divText);
+    }}
+
+    function checkingAnswers(i, arr) {
+
+        return function() {
+            var userAnswer=i
+            correctAnswer= arr[arr.length-1]
+    
+            if (userAnswer === correctAnswer) {
+                result(true);
+            } else{
+                result(false)
+                timeLeft-=15;
+            }
+            if (currentQuestion<Object.keys(allQuestions).length-1){
+                currentQuestion+=1
+    
+                getQuestions(currentQuestion)
+                getAnswers(currentQuestion)
+            }else{
+                clearInterval(startTime);
+                gameOver()
+            }
+
+        }
+    }
+    
+
+    function result(bool){
+        correct = document.createTextNode("Correct")
+        incorrect = document.createTextNode("Wrong")
+        checkAnswers.innerHTML=""
+        if(bool){
+            checkAnswers.appendChild(correct)        
+        }else{
+            checkAnswers.appendChild(incorrect)
+    
+        }
+    }
+    
     function gameOver(){
+        timer.innerHTML = ""
+        divEl.removeChild(questionsEl)
+        divEl.removeChild(answersEl)
+        body.removeChild(divEl)
         body.appendChild(h2El)
         body.appendChild(finalScore)
         body.appendChild(divEl)
         divEl.appendChild(initials)
         divEl.appendChild(textArea)
-
+        divEl.appendChild(saveBtn)
+        finalScore.textContent = "Your final score is " + timeLeft
+        textArea.setAttribute("id", "user")
+        
     }
 
-    function quiz(){
-        body.appendChild(divEl)
-        divEl.appendChild(questionsEl)
-        divEl.appendChild(answersEl)
-        divEl.appendChild(checkAnswers)
+    saveBtn.addEventListener ("click", function(e){
+    
+        var user = document.getElementById("user").value
+        localStorage.setItem("user", user)
+        localStorage.setItem("score", timeLeft)
 
-        current= 0;
-
-        allQuestions = {
-            "Commonly used datatype do not include:" : ["stings", "booleans", "alerts", "numbers", 2],
-            "Arrays in JavaScript and be used to store:" : ["other arrays", "booleans", "numbers and strings","all of the above", 3],
-            "String values must be closed withing ______ when being assigned to variables." : ["commas","curly brackets","quotes","parenthesis", 2],
-            "A very useful tool during developement debugging for printing content to the debugger is:" : ["JavaScript", "terminal", "for loops", "console.log", 3]
-        }
-    }
+        divEl.removeChild(initials)
+        divEl.removeChild(textArea)
+        divEl.removeChild(saveBtn)
+        body.removeChild(h2El)
+        body.removeChild(finalScore)
+        body.removeChild(divEl)
+    
+        init()
+    })
+}
+timeLeft -= 1;
+}, 1000)
 });
 
-init()
+
+
+
+
+
+
+init();
