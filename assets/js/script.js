@@ -166,10 +166,13 @@ startBtn.addEventListener("click", function(){
     }
 
     saveBtn.addEventListener ("click", function(e){
-    
+        
         var user = document.getElementById("user").value
-        localStorage.setItem("user", user)
-        localStorage.setItem("score", timeLeft)
+        var hsList = document.getElementById("highscore")
+        var createLI = document.createElement("li")
+
+        hsList.appendChild(createLI)
+        createLI.textContent = user + ", " + timeLeft
 
         divEl.removeChild(initials)
         divEl.removeChild(textArea)
@@ -184,10 +187,6 @@ startBtn.addEventListener("click", function(){
 timeLeft -= 1;
 }, 1000)
 });
-
-
-
-
 
 
 
