@@ -13,8 +13,8 @@ var questionsEl = document.createElement("p")
 var answersEl = document.createElement("ul")
 var checkAnswers = document.createElement("div")
 var saveBtn = document.createElement("button")
+gameOverDiv= document.createElement("div")
 
-currentQuestion = 0
 
 allQuestions = {
     "Commonly used datatype do not include:" : ["stings" , "booleans" , "alerts" , "numbers" , 2],
@@ -42,6 +42,9 @@ divEl.setAttribute("style", "display: flex; flex-direction:column; align-items: 
 textArea.setAttribute("style", "height: 16px; width: 100px;")
 h2El.setAttribute("style", "text-align: center;")
 finalScore.setAttribute("style", "text-align: center;")
+gameOverDiv.setAttribute("style", "display: flex; flex-direction:column; align-items: center; justify-content:center;")
+
+
 
 function init(){
 body.appendChild(h1El);
@@ -59,6 +62,7 @@ startBtn.addEventListener("click", function(){
     body.appendChild(divEl)
     divEl.appendChild(questionsEl)
     divEl.appendChild(answersEl)
+    currentQuestion = 0
 
     questionsEl.setAttribute("style","text-align: center; display: flex; justify-content:center; font-weight: bolder; font-size:25px;")
 
@@ -67,14 +71,13 @@ startBtn.addEventListener("click", function(){
 
 
     var timeLeft = 75;
-    var startTime = setInterval(function(){
+    var startTime = setInterval(function(e){
         if(timeLeft < 0){
         gameOver();
         clearInterval(startTime);
         
         } else {
         timer.innerHTML = "Time remaining: " + timeLeft;
-
         getQuestions(currentQuestion)
         getAnswers(currentQuestion)
         
@@ -142,9 +145,11 @@ startBtn.addEventListener("click", function(){
         incorrect = document.createTextNode("Wrong")
         checkAnswers.innerHTML=""
         if(bool){
-            checkAnswers.appendChild(correct)        
+            checkAnswers.appendChild(correct)  
+            clearInterval(result)      
         }else{
             checkAnswers.appendChild(incorrect)
+            clearInterval(result)   
     
         }
     }
@@ -153,41 +158,43 @@ startBtn.addEventListener("click", function(){
         timer.innerHTML = ""
         divEl.removeChild(questionsEl)
         divEl.removeChild(answersEl)
+        divEl.removeChild(checkAnswers)
         body.removeChild(divEl)
         body.appendChild(h2El)
         body.appendChild(finalScore)
-        body.appendChild(divEl)
-        divEl.appendChild(initials)
-        divEl.appendChild(textArea)
-        divEl.appendChild(saveBtn)
+        body.appendChild(gameOverDiv)
+        gameOverDiv.appendChild(initials)
+        gameOverDiv.appendChild(textArea)
+        gameOverDiv.appendChild(saveBtn)
         finalScore.textContent = "Your final score is " + timeLeft
-        textArea.setAttribute("id", "user")
+           
         
-    }
+    
+    //creates a blank score array or adds to a current array
+    var highScores = JSON.parse(localStorage.getItem("scores")) || []
+    
 
-    saveBtn.addEventListener ("click", function(e){
-        
-        var user = document.getElementById("user").value
-        var hsList = document.getElementById("highscore")
-        var createLI = document.createElement("li")
+    //saves to local storage on click
+    saveBtn.addEventListener ("click", function(){
+        var score= {
+            score: timeLeft.toString(),
+            user: textArea.value
+        }
 
-        hsList.appendChild(createLI)
-        createLI.textContent = user + ", " + timeLeft
+        highScores.push(score);
+        localStorage.setItem("scores",JSON.stringify(highScores));
 
-        divEl.removeChild(initials)
-        divEl.removeChild(textArea)
-        divEl.removeChild(saveBtn)
+
         body.removeChild(h2El)
         body.removeChild(finalScore)
-        body.removeChild(divEl)
+        body.removeChild(gameOverDiv)
     
         init()
-    })
+    
+    })}
 }
 timeLeft -= 1;
 }, 1000)
 });
-
-
 
 init();
