@@ -1,3 +1,4 @@
+//used to create all elements
 var body = document.body;
 var h1El = document.createElement("h1");
 var h2El = document.createElement("h2");
@@ -15,7 +16,7 @@ var checkAnswers = document.createElement("div")
 var saveBtn = document.createElement("button")
 gameOverDiv= document.createElement("div")
 
-
+//questions array
 allQuestions = {
     "Commonly used datatype do not include:" : ["stings" , "booleans" , "alerts" , "numbers" , 2],
     
@@ -33,7 +34,7 @@ initials.textContent = "Enter your initials: "
 h2El.textContent = "All done"
 saveBtn.textContent = "Save"
 
-
+//styling
 h1El.setAttribute("style", "margin:auto; padding-top:50px; text-align:center;");
 infoEl.setAttribute("style", "margin:auto; padding:50px; text-align:center;");
 startBtn.setAttribute("style", "position: absolute; left: 50%; background-color: pink; font-size: 20px;");
@@ -54,7 +55,7 @@ body.appendChild(startBtn);
 }
 
 
-
+//on start removes previous items and starts the quiz and timer
 startBtn.addEventListener("click", function(){
     body.removeChild(h1El);
     body.removeChild(infoEl);
@@ -69,7 +70,7 @@ startBtn.addEventListener("click", function(){
     questionsEl.classList.add("questions")
     answersEl.classList.add("answers")
 
-
+    //timer countdown
     var timeLeft = 75;
     var startTime = setInterval(function(e){
         if(timeLeft < 0){
@@ -95,7 +96,7 @@ startBtn.addEventListener("click", function(){
     }
     
     function getAnswers(curr){
-    
+    //sets up the answers to the question
         var answers = allQuestions[Object.keys(allQuestions)[curr]];
     
         answersEl.innerHTML = "";
@@ -113,7 +114,7 @@ startBtn.addEventListener("click", function(){
     
         answersEl.appendChild(divText);
     }}
-
+    //checks if answer was correct. if not it will deduct time from the clock
     function checkingAnswers(i, arr) {
 
         return function() {
@@ -139,7 +140,7 @@ startBtn.addEventListener("click", function(){
         }
     }
     
-
+    //shows results after answering a question
     function result(bool){
         correct = document.createTextNode("Correct")
         incorrect = document.createTextNode("Wrong")
@@ -153,7 +154,7 @@ startBtn.addEventListener("click", function(){
     
         }
     }
-    
+    //give score and allows you to input your initials
     function gameOver(){
         timer.innerHTML = ""
         divEl.removeChild(questionsEl)
